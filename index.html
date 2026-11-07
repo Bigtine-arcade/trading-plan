@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070a11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Trading Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070a11; --card:#101724; --card2:#0b111b; --line:#1b2431; --line2:#28374b;
+  --txt:#eaf0fa; --dim:#7f8da3; --dim2:#586576;
+  --acc:#4d8dff; --good:#00d68f; --bad:#ff5a5f; --warn:#ffc247;
+  --disp:'Barlow Condensed',Oswald,'Arial Narrow',Impact,sans-serif;
+  --body:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --nav:64px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(1200px 600px at 50% -15%,#12203a 0%,var(--bg) 55%) fixed,var(--bg);
+  color:var(--txt);font-family:var(--body);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 14px);
+}
+.wrap{max-width:880px;margin:0 auto;padding:14px 14px 0}
+h1,h2,h3,.disp,.num{font-family:var(--disp);font-weight:700;letter-spacing:-.01em}
+.num{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.brand{font-family:var(--disp);font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.brand b{color:var(--txt)}
+.chip{font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:999px;
+      border:1px solid var(--line2);background:#0d1522;color:var(--dim);white-space:nowrap}
+.chip.g{color:var(--good);border-color:rgba(0,214,143,.45);background:rgba(0,214,143,.1)}
+.chip.w{color:var(--warn);border-color:rgba(255,194,71,.45);background:rgba(255,194,71,.1)}
+.chip.b{color:var(--bad);border-color:rgba(255,90,95,.45);background:rgba(255,90,95,.1)}
+
+/* cards */
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+      border-radius:16px;padding:15px;margin-bottom:12px}
+.card.hero{padding:18px 16px 15px;position:relative;overflow:hidden}
+.card.hero:after{content:"";position:absolute;inset:-40% -30% auto auto;width:320px;height:320px;
+      background:radial-gradient(circle,rgba(77,141,255,.16),transparent 65%);pointer-events:none}
+.k{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim2);font-weight:600}
+.eq{font-family:var(--disp);font-weight:700;font-size:clamp(46px,13.5vw,66px);line-height:.95;
+    letter-spacing:-.025em;font-variant-numeric:tabular-nums;margin:2px 0 0}
+.heroSub{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
+.hint{font-size:12.5px;color:var(--dim)}
+.bar{height:7px;border-radius:99px;background:#131c2a;overflow:hidden;margin-top:14px;border:1px solid #162030}
+.bar>i{display:block;height:100%;border-radius:99px;
+   background:linear-gradient(90deg,#2f6fe0,#4d8dff 55%,#8fd0ff);transition:width .5s ease}
+.barTop{display:flex;justify-content:space-between;margin-top:7px;font-size:11.5px;color:var(--dim2)}
+
+/* grids */
+.cols{display:grid;gap:12px}
+@media(min-width:900px){.cols{grid-template-columns:1fr 1fr}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:11px}
+.box{background:#0a111b;border:1px solid #17202d;border-radius:11px;padding:10px 11px}
+.box b{display:block;font-family:var(--disp);font-size:22px;line-height:1.15;margin-top:1px;
+       font-variant-numeric:tabular-nums}
+.box.hi{border-color:#2c4f85;background:linear-gradient(180deg,#0d1930,#0a1220)}
+.box.hi b{color:#8fc0ff;font-size:26px}
+
+/* inputs */
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.row>div{flex:1 1 110px;min-width:0}
+label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+      color:var(--dim2);font-weight:600;margin-bottom:4px}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line2);
+      background:#070d16;color:var(--txt);font-family:var(--body);font-size:16px;font-weight:600;
+      -moz-appearance:textfield}
+input:focus,select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(77,141,255,.15)}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* buttons */
+button{font-family:var(--body);cursor:pointer;border:0;border-radius:11px;
+       padding:12px 14px;font-size:14px;font-weight:700;color:#fff;transition:transform .06s,filter .15s}
+button:active{transform:scale(.98)}
+.btnWin{background:linear-gradient(180deg,#00b87b,#008f60)}
+.btnLose{background:linear-gradient(180deg,#e04b50,#b43439)}
+.btnGhost{background:#18212f;color:var(--txt);border:1px solid var(--line2)}
+.btnSkip{background:#141d2b;color:var(--warn);border:1px solid rgba(255,194,71,.35)}
+.btnRow{display:flex;gap:9px;margin-top:11px}
+.btnRow>button{flex:1}
+
+/* message */
+#msg{display:none;margin-top:12px;padding:13px;border-radius:12px;font-size:14px;line-height:1.6}
+#msg.g{display:block;background:rgba(0,214,143,.09);border:1px solid rgba(0,214,143,.4)}
+#msg.w{display:block;background:rgba(255,194,71,.09);border:1px solid rgba(255,194,71,.4)}
+#msg.b{display:block;background:rgba(255,90,95,.09);border:1px solid rgba(255,90,95,.4)}
+#msg.n{display:block;background:rgba(77,141,255,.08);border:1px solid rgba(77,141,255,.35)}
+#msg b{color:#fff}
+#msg .sm{display:block;margin-top:7px;font-size:12.5px;color:var(--dim)}
+
+/* chart */
+.chartBox{position:relative;margin-top:6px;width:100%}
+canvas{display:block;width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:12px;color:var(--dim)}
+.legend i{display:inline-block;width:16px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* history */
+.hrow{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #151e2a}
+.hrow:last-child{border-bottom:0}
+.hdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.hmain{flex:1;min-width:0}
+.hdate{font-size:13.5px;font-weight:600}
+.hsub{font-size:11.5px;color:var(--dim2)}
+.hval{font-family:var(--disp);font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.g2{color:var(--good)}.r2{color:var(--bad)}.d2{color:var(--dim2)}
+
+/* bottom nav */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:50;
+    padding-bottom:env(safe-area-inset-bottom);
+    background:rgba(8,12,19,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--line)}
+.navin{max-width:880px;margin:0 auto;display:flex;height:var(--nav)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+     background:none;border:0;color:var(--dim2);font-size:10.5px;font-weight:600;
+     letter-spacing:.09em;text-transform:uppercase;padding:6px 0;border-radius:0;position:relative}
+.tab svg{width:22px;height:22px;transition:transform .18s}
+.tab.on{color:var(--acc)}
+.tab.on svg{transform:translateY(-1px) scale(1.06)}
+.tab.on:before{content:"";position:absolute;top:0;width:34px;height:2.5px;border-radius:0 0 3px 3px;
+     background:var(--acc);box-shadow:0 0 14px rgba(77,141,255,.9)}
+.page{display:none}
+.page.on{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+.foot{text-align:center;font-size:11.5px;color:var(--dim2);padding:16px 6px 4px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Trading <b>Plan</b></div>
+    <div class="chip" id="statusChip">—</div>
+  </div>
+
+  <!-- ============ PLAN ============ -->
+  <section class="page on" id="p-plan">
+
+    <div class="card hero">
+      <div class="k">Account equity</div>
+      <div class="eq num" id="eqBig">$26.00</div>
+      <div class="heroSub">
+        <span class="chip" id="todayChip">$0.00 today</span>
+        <span class="hint" id="vsPlan">—</span>
+      </div>
+      <div class="bar"><i id="progFill" style="width:0%"></i></div>
+      <div class="barTop"><span id="progLeft">$26</span><span id="progMid">goal $5,000 by 29 Jan · curve to 19 Feb</span><span id="progRight">done 0%</span></div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <div class="k">Today's target</div>
+        <div class="grid2">
+          <div class="box hi"><span class="k" id="mkLabel">Make today</span><b id="goalAmt">—</b></div>
+          <div class="box"><span class="k">Or this many R</span><b id="goalR">—</b></div>
+          <div class="box"><span class="k">Pace needed</span><b id="paceNow">—</b></div>
+          <div class="box"><span class="k">Sessions left</span><b id="sessLeft">—</b></div>
+        </div>
+        <div class="hint" id="goalNote" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <div class="k">Size the trade</div>
+        <div class="row" style="margin-top:9px">
+          <div style="flex:1.1 1 110px">
+            <label>Pair</label>
+            <select id="pair">
+              <option>EURUSD</option><option>GBPUSD</option><option>AUDUSD</option>
+              <option>NZDUSD</option><option>USDCAD</option><option>USDCHF</option>
+              <option>USDJPY</option><option>EURJPY</option><option>GBPJPY</option>
+              <option>XAUUSD</option><option>BTCUSD</option><option>Other</option>
+            </select>
+          </div>
+          <div><label>Stop (pips)</label><input id="sl" type="number" step="0.1" value="20" inputmode="decimal"></div>
+          <div><label>Target (pips)</label><input id="tp" type="number" step="0.1" value="40" inputmode="decimal"></div>
+        </div>
+        <div class="row" style="margin-top:9px">
+          <div><label>Price (USDxxx/gold)</label><input id="price" type="number" step="0.00001" placeholder="opt" inputmode="decimal"></div>
+          <div><label>Pip val / 1.00 lot</label><input id="pv" type="number" step="0.01" value="10" inputmode="decimal"></div>
+          <div><label>Lot step</label>
+            <select id="step">
+              <option value="0.01">0.01</option><option value="0.001">0.001 cent</option><option value="0.1">0.1</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="box"><span class="k">Risk %</span><b id="o_risk">—</b></div>
+          <div class="box"><span class="k">Risk in $</span><b id="o_riskusd">—</b></div>
+          <div class="box hi" style="grid-column:1/-1"><span class="k">Lot size</span><b id="o_lot">—</b></div>
+          <div class="box" style="grid-column:1/-1"><span class="k">Profit if target hit</span><b id="o_tp">—</b></div>
+        </div>
+        <div class="hint" id="o_note" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="k">Log the result</div>
+      <div class="row" style="margin-top:9px">
+        <div style="flex:2 1 150px"><label>Amount (positive)</label>
+          <input id="result" type="number" step="0.01" placeholder="0.00" inputmode="decimal"></div>
+        <div style="flex:1.4 1 150px;display:flex;gap:9px;align-items:flex-end">
+          <button class="btnWin" onclick="logTrade(1)" style="flex:1">Won</button>
+          <button class="btnLose" onclick="logTrade(0)" style="flex:1">Lost</button>
+        </div>
+      </div>
+      <div class="btnRow">
+        <button class="btnSkip" onclick="advanceDay(1)">No setup today</button>
+        <button class="btnGhost" onclick="advanceDay(0)">End day</button>
+      </div>
+      <div id="msg"></div>
+    </div>
+
+  </section>
+
+  <!-- ============ GROWTH ============ -->
+  <section class="page" id="p-growth">
+    <div class="card">
+      <div class="k">Equity curve — actual vs plan</div>
+      <div class="chartBox"><canvas id="chart" height="260"></canvas></div>
+      <div class="legend">
+        <span><i style="background:var(--good)"></i>You</span>
+        <span><i style="background:var(--acc)"></i>Plan curve · $5k goal 29 Jan, continues to 19 Feb</span>
+        <span><i style="background:#4a5566"></i>goal marker</span>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <div class="k">Where you stand</div>
+        <div class="grid2">
+          <div class="box"><span class="k">Plan says now</span><b id="g_plan">—</b></div>
+          <div class="box"><span class="k">You vs plan</span><b id="g_diff">—</b></div>
+          <div class="box"><span class="k">Multiple of start</span><b id="g_mult">—</b></div>
+          <div class="box"><span class="k">Left to $5k</span><b id="g_left">—</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="k">Discipline</div>
+        <div class="grid2">
+          <div class="box"><span class="k">Sessions used</span><b id="g_used">—</b></div>
+          <div class="box"><span class="k">Days flat</span><b id="g_flat">—</b></div>
+          <div class="box"><span class="k">Trades taken</span><b id="g_trades">—</b></div>
+          <div class="box"><span class="k">Win rate</span><b id="g_wr">—</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="k">Next checkpoint</div>
+      <div class="hint" id="g_next" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section class="page" id="p-history">
+    <div class="card">
+      <div class="k">Summary</div>
+      <div class="grid3">
+        <div class="box"><span class="k">Net</span><b id="h_net">—</b></div>
+        <div class="box"><span class="k">Best day</span><b id="h_best">—</b></div>
+        <div class="box"><span class="k">Worst day</span><b id="h_worst">—</b></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="k">Session log</div>
+      <div id="h_list" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <div class="k">Backup</div>
+      <div class="hint" id="b_status" style="margin-top:8px"></div>
+      <div class="btnRow">
+        <button class="btnGhost" onclick="exportData()">Save backup file</button>
+        <button class="btnGhost" onclick="document.getElementById('importFile').click()">Restore</button>
+      </div>
+      <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importData(event)">
+      <div class="hint" style="margin-top:9px">Do this every Friday. Two seconds, and it is the only thing standing between a browser glitch and ten weeks of records.</div>
+    </div>
+    <div class="card">
+      <button class="btnGhost" style="width:100%" onclick="resetAll()">Reset everything</button>
+    </div>
+  </section>
+
+  <div class="foot">
+    Goal $5,000 by Fri 29 Jan 2027 (session <span id="fGoal">56</span>) ·
+    bonus curve continues to Fri 19 Feb · <span id="fSess">70</span> sessions total
+  </div>
+</div>
+
+<nav>
+  <div class="navin">
+    <button class="tab on" data-tab="plan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.2"/>
+        <path d="M12 1.5v2M12 20.5v2M1.5 12h2M20.5 12h2"/>
+      </svg>Plan
+    </button>
+    <button class="tab" data-tab="growth">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 17.5l5.2-6.1 3.9 2.9L21 5"/><path d="M16.6 5H21v4.4"/>
+      </svg>Growth
+    </button>
+    <button class="tab" data-tab="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="8.7"/><path d="M12 7.2V12l3.2 2"/>
+      </svg>History
+    </button>
+  </div>
+</nav>
+
+<script>
+/* ================= CONFIG ================= */
+const START_EQ=26, GOAL=5000;
+const START_DATE='2026-11-09', DEADLINE='2027-02-19', GOAL_DATE='2027-01-29';
+const HOLIDAYS=new Set(['2026-11-26','2026-12-25','2027-01-01','2027-01-18','2027-02-15']);
+
+const SESSIONS=(()=>{
+  const out=[], d=new Date(START_DATE+'T00:00:00Z'), end=new Date(DEADLINE+'T00:00:00Z');
+  while(d<=end){
+    const w=d.getUTCDay(), iso=d.toISOString().slice(0,10);
+    if(w!==0&&w!==6&&!HOLIDAYS.has(iso)) out.push(iso);
+    d.setUTCDate(d.getUTCDate()+1);
+  }
+  return out;
+})();
+const TOTAL=SESSIONS.length;
+const GOAL_IDX=SESSIONS.filter(d=>d<=GOAL_DATE).length;   /* 56 = Fri 29 Jan */
+
+const PAIRS={
+  EURUSD:{pip:0.0001,pv:10}, GBPUSD:{pip:0.0001,pv:10}, AUDUSD:{pip:0.0001,pv:10},
+  NZDUSD:{pip:0.0001,pv:10}, USDCAD:{pip:0.0001,pv:10,usd:1},
+  USDCHF:{pip:0.0001,pv:12.5,usd:1}, USDJPY:{pip:0.01,pv:6.7,usd:1},
+  EURJPY:{pip:0.01,pv:6.7}, GBPJPY:{pip:0.01,pv:6.7},
+  XAUUSD:{pip:0.1,pv:10}, BTCUSD:{pip:1,pv:1}, Other:{pip:0.0001,pv:10}
+};
+
+/* ================= STATE ================= */
+const KEY='tplan-v2';
+const DEF={v:2, eq:START_EQ, day:0, dayStart:START_EQ, streak:0, dayTrades:[], log:[]};
+let S=Object.assign({},DEF);
+try{const raw=localStorage.getItem(KEY); if(raw){const o=JSON.parse(raw); if(o&&typeof o.eq==='number') S=Object.assign({},DEF,o);}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+const $=id=>document.getElementById(id);
+const money=v=>(v<0?'-$':'$')+Math.abs(v).toFixed(2);
+const signed=v=>(v>=0?'+':'-')+'$'+Math.abs(v).toFixed(2);
+const shortM=v=>v>=1000?'$'+(v/1000).toFixed(v>=10000?0:1)+'k':'$'+Math.round(v);
+
+/* ================= MATH ================= */
+/* plan line keeps compounding past the goal at the same rate — bonus curve to 19 Feb */
+function planAt(s){
+  const t=Math.max(0,Math.min(TOTAL,s))/GOAL_IDX;
+  return START_EQ*Math.pow(GOAL/START_EQ,t);
+}
+function reqRate(eq,s){
+  if(eq<=0) return Infinity;
+  const left=GOAL_IDX-s;
+  if(left<=0) return 0;                                     /* goal window closed — bonus only */
+  return Math.pow(GOAL/eq,1/left)-1;
+}
+function riskPct(eq){
+  if(eq<100) return 20;
+  if(eq<300) return 17;
+  if(eq<800) return 14;
+  if(eq<2000) return 11;
+  if(eq<5000) return 8;
+  return 2;
+}
+function taper(){
+  if(S.streak>=3) return 0;
+  if(S.streak===2) return 0.4;
+  if(S.streak===1) return 0.6;
+  return 1;
+}
+function flatStreak(){
+  let n=0;
+  for(let i=S.log.length-1;i>=0;i--){
+    const e=S.log[i];
+    if(e.skipped||!e.trades||e.trades.length===0) n++; else break;
+  }
+  return n;
+}
+function setMsg(cls,html){const m=$('msg'); m.className=cls; m.innerHTML=html;}
+
+/* ================= PLAN TAB ================= */
+function renderPlan(){
+  const eq=S.eq, post=S.day>=GOAL_IDX;
+  const planNow=planAt(S.day), planToday=planAt(S.day+1);
+  $('eqBig').textContent=money(eq);
+
+  const delta=S.eq-S.dayStart;
+  const tChip=$('todayChip');
+  tChip.textContent=(delta===0?'$0.00 today':signed(delta)+' today');
+  tChip.className='chip '+(delta>0.004?'g':delta<-0.004?'b':'');
+
+  const vs=eq/planNow-1;
+  const vp=$('vsPlan');
+  vp.textContent=(vs>=0?'ahead of':'behind')+' the plan line by '+Math.abs(vs*100).toFixed(1)+'%';
+  vp.style.color=vs>=0?'var(--good)':'var(--bad)';
+
+  const pct=Math.max(0,Math.min(100, Math.log(Math.max(eq,1)/START_EQ)/Math.log(planAt(TOTAL)/START_EQ)*100));
+  $('progFill').style.width=pct+'%';
+  $('progLeft').textContent=money(eq);
+  $('progRight').textContent='done '+pct.toFixed(0)+'%';
+
+  const need=Math.max(0, planToday-eq);
+  $('mkLabel').textContent=post?'Bonus today':'Make today';
+  $('goalAmt').textContent = need>0.005 ? (post?'~+':'+')+money(need) : 'DONE';
+
+  const base=riskPct(eq), tp=taper(), eff=base*tp, riskUSD=eq*eff/100;
+  $('goalR').textContent = (need>0.005 && riskUSD>0) ? (need/riskUSD).toFixed(2)+'R' : '—';
+  const rate=reqRate(eq,S.day);
+  $('paceNow').textContent=post?'bonus':(isFinite(rate)?(rate*100).toFixed(1)+'%':'—');
+  $('sessLeft').textContent = post ? (TOTAL-S.day)+' bonus' : (GOAL_IDX-S.day)+' to goal';
+
+  let note;
+  if(eq>=GOAL && post){
+    note='Goal is banked. This target is pure bonus at the 2% protect-mode cap — stop whenever you decide the day is done.';
+  } else if(eq>=GOAL){
+    note='Goal reached early. Risk is now capped at 2%. Targets from here are bonus — same discipline, house money only.';
+  } else if(need<=0.005){
+    note='You are at or above the plan line. Anything else you take today is optional and must be at half size.';
+  } else if(eff<=0){
+    note='Three losses logged. Stop for the day — the sizer is switched off until tomorrow.';
+  } else {
+    const trades=Math.max(1,Math.ceil((need/Math.max(riskUSD,0.01))/0.4));
+    note='That is about '+trades+' quality setup'+(trades>1?'s':'')+' at ~0.4R. When you hit it, stop — the target is a stop, not a quota.';
+  }
+  $('goalNote').textContent=note;
+
+  const chip=$('statusChip');
+  if(eq>=GOAL){chip.textContent='GOAL HIT';chip.className='chip g';}
+  else if(vs>=-0.02){chip.textContent='ON TRACK';chip.className='chip g';}
+  else if(vs>=-0.18){chip.textContent='SLIGHTLY BEHIND';chip.className='chip w';}
+  else {chip.textContent='BEHIND';chip.className='chip b';}
+
+  renderSizer();
+  save();
+}
+
+function suggestPV(){
+  const p=PAIRS[$('pair').value]||PAIRS.Other;
+  const price=parseFloat($('price').value)||0;
+  if(p.usd&&price>0) $('pv').value=(p.pip*100000/price).toFixed(2);
+  else $('pv').value=p.pv;
+}
+
+function renderSizer(){
+  const eq=S.eq, sl=parseFloat($('sl').value)||0, tpx=parseFloat($('tp').value)||0;
+  const pv=parseFloat($('pv').value)||0, step=parseFloat($('step').value)||0.01;
+  const base=riskPct(eq), tp2=taper(), eff=base*tp2, riskUSD=eq*eff/100;
+
+  $('o_risk').textContent=eff.toFixed(0)+'%'+(tp2<1?' ×'+tp2:'');
+  $('o_riskusd').textContent=money(riskUSD);
+
+  if(eff<=0){
+    $('o_lot').textContent='STOP'; $('o_lot').style.color='var(--bad)';
+    $('o_tp').textContent='—';
+    $('o_note').textContent='Three losses today. No more trades. Close the app and come back tomorrow at full size.';
+    return;
+  }
+  if(!(sl>0&&pv>0)){
+    $('o_lot').textContent='—'; $('o_lot').style.color='#8fc0ff';
+    $('o_tp').textContent='—';
+    $('o_note').textContent='Enter the stop in pips to get the lot size.';
+    return;
+  }
+  const dec = step<0.01?3:2;
+  const raw=riskUSD/(sl*pv);
+  let lots=Math.floor(raw/step+1e-9)*step;
+  lots=Math.round(lots*1000)/1000;
+
+  if(lots<step){
+    const minCost=step*sl*pv;
+    $('o_lot').textContent='too small';
+    $('o_lot').style.color='var(--bad)';
+    $('o_tp').textContent='—';
+    $('o_note').innerHTML='Smallest lot on this broker risks <b>'+money(minCost)+
+      '</b> — more than your '+money(riskUSD)+' allowance. Use a cent account (0.001 lots) or skip the setup. Do not take it anyway.';
+    return;
+  }
+  $('o_lot').style.color='#8fc0ff';
+  $('o_lot').textContent=lots.toFixed(dec);
+  const realRisk=lots*sl*pv, realTP=tpx>0?lots*tpx*pv:0;
+  $('o_tp').textContent=tpx>0?'+'+money(realTP):'—';
+
+  const R=tpx>0?tpx/sl:0;
+  let note='Actual risk '+money(realRisk)+' ('+(realRisk/eq*100).toFixed(1)+'% of equity).';
+  if(R>0&&R<1.5) note+=' R is only '+R.toFixed(2)+' — below 1.5, skip it.';
+  else if(R>0) note+=' R = '+R.toFixed(2)+'.';
+  $('o_note').textContent=note;
+}
+
+function logTrade(win){
+  const amt=Math.abs(parseFloat($('result').value)||0);
+  if(!amt){ setMsg('w','Type the amount first (a positive number).'); return; }
+  const pair=$('pair').value, lots=$('o_lot').textContent;
+
+  if(win){ S.eq+=amt; S.streak=0; }
+  else { S.eq=Math.max(0.01,S.eq-amt); S.streak++; }
+  S.dayTrades.push({win:!!win,amt:amt,pair:pair,lots:lots});
+  $('result').value='';
+
+  const planToday=planAt(S.day+1), planNow=planAt(S.day);
+  const left=Math.max(1,GOAL_IDX-S.day);
+  const need=reqRate(S.eq,S.day);
+  const gained=S.eq-S.dayStart;
+  const post=S.day>=GOAL_IDX;
+
+  if(win){
+    if(S.eq>=GOAL && !post){
+      setMsg('g','<b>GOAL HIT — $5,000 reached with sessions to spare.</b> You are at '+money(S.eq)+
+        ' ('+signed(gained)+' today).'+
+        '<span class="sm">Risk is now capped at 2%. Press "End day" — the curve keeps going to 19 Feb as bonus, nothing further is required.</span>');
+    } else if(S.eq>=planToday){
+      setMsg('g','<b>'+(post?'Bonus target hit. ':'Target hit. ')+'Stop trading today.</b> You are at '+money(S.eq)+
+        ' ('+signed(gained)+' today), '+((S.eq/planNow-1)*100).toFixed(0)+'% vs the plan line.'+
+        '<span class="sm">Press "End day". Anything after this point is optional and half size only.</span>');
+    } else {
+      setMsg('g','<b>Good.</b> '+signed(gained)+' banked. You still need '+money(planToday-S.eq)+
+        ' to reach today\'s '+(post?'bonus':'')+' line — same size if the setup is there, never bigger.'+
+        '<span class="sm">'+(post?'Bonus curve — no required pace.':'Pace after this: '+(need*100).toFixed(1)+'% per session over '+left+' sessions.')+'</span>');
+    }
+  } else {
+    if(S.streak>=3){
+      setMsg('b','<b>Three losses. Stop for the day.</b> Not "one more", not tonight. Close it and press "End day".'+
+        '<span class="sm">Tomorrow you restart at full size. Revenge trading is what turns a bad day into a blown account.</span>');
+    } else if(S.streak===2){
+      setMsg('w','<b>Two losses — next trade at 40% size.</b> The sizer has already updated. If that one loses, you are done for the day.');
+    } else {
+      setMsg('w','<b>One loss.</b> Next trade at 60% size, and only if it is an A+ setup. No clean setup means you are flat — that costs $0.'+
+        '<span class="sm">'+(post?'Bonus curve — no required pace.':'Pace after this: '+(need*100).toFixed(1)+'% per session over '+left+' sessions.')+'</span>');
+    }
+    if(S.eq<planNow*0.75){
+      $('msg').innerHTML+='<span class="sm"><b>You are well behind the line.</b> Do not raise risk to catch up — that is the most common way small accounts die. Keep the size the tool gives you.</span>';
+    }
+  }
+  renderAll();
+}
+
+function advanceDay(skipped){
+  if(S.day>=TOTAL){ setMsg('b','Deadline reached. The log is closed.'); return; }
+
+  const beforeEq=S.eq, beforeDay=S.day;
+  const oldRate=reqRate(beforeEq,beforeDay);
+
+  S.log.push({
+    i:S.day, date:SESSIONS[S.day], start:S.dayStart, end:S.eq,
+    skipped:!!skipped, trades:S.dayTrades.slice()
+  });
+  S.day=Math.min(TOTAL,S.day+1);
+  S.dayStart=S.eq; S.streak=0; S.dayTrades=[];
+
+  const left=Math.max(1,GOAL_IDX-S.day);
+  const newRate=reqRate(S.eq,S.day);
+  const goalTom=Math.max(0,planAt(S.day+1)-S.eq);
+  const skipRun=flatStreak();
+  const goalHit=beforeEq>=GOAL;
+  const post=S.day>=GOAL_IDX;
+
+  if(skipped){
+    const capNeed=Math.max(0, (GOAL/Math.pow(1+oldRate,Math.max(left,1)))-S.eq);
+    let html='<b>Day '+beforeDay+' logged as flat. Cost: $0.00.</b>';
+    if(post||goalHit){
+      html+='<span class="sm"><b>'+(goalHit?'Goal already banked.':'Bonus phase.')+'</b> Flat days cost nothing — the remaining curve is optional bonus, not required.</span>';
+    } else {
+      html+='<span class="sm">Pace moved from <b>'+(oldRate*100).toFixed(1)+'%</b> to <b>'+
+        (isFinite(newRate)?(newRate*100).toFixed(1):'—')+'%</b> per session ('+left+' left to goal).</span>';
+      if(!isFinite(newRate)||newRate>0.16){
+        html+='<span class="sm"><b>This pace is no longer realistic at survivable risk.</b> Two honest options: '+
+          '(1) add about '+money(capNeed)+' of capital, which puts you back at '+(oldRate*100).toFixed(1)+
+          '% per session; (2) move the finish line. Do not fund it with bigger lots.</span>';
+      } else if(newRate>0.10){
+        html+='<span class="sm"><b>Next session you need +'+money(goalTom)+'.</b> That is steep. If you can add '+
+          money(capNeed)+' of capital the requirement drops back to '+(oldRate*100).toFixed(1)+
+          '%. Otherwise take only your best setup and let the date slip.</span>';
+      } else {
+        html+='<span class="sm"><b>Next session: +'+money(goalTom)+'.</b> Still a workable pace. Take your best 1–2 setups at the size the tool gives you. Same risk, extra session — never extra risk.</span>';
+      }
+    }
+    if(skipRun>=3){
+      html+='<span class="sm"><b>'+skipRun+' flat days in a row.</b> That is a signal, not bad luck: your strategy or your session window does not fit these markets. Paper-trade 10 setups and check the edge before risking more.</span>';
+    }
+    setMsg('n',html);
+  } else {
+    const planToday=planAt(beforeDay+1);
+    const onTime=beforeEq>=planToday;
+    setMsg(onTime?'g':'w',
+      '<b>Day '+beforeDay+' closed at '+money(beforeEq)+'.</b> '+
+      (goalHit?'Goal is banked — bonus mode from here.'
+        :onTime?'On or ahead of plan.':'Behind plan — do not chase it.')+
+      '<span class="sm">Next session '+(post||goalHit?'bonus target: +':'target: +')+money(goalTom)+
+      ' · pace '+(isFinite(newRate)&&!post?(newRate*100).toFixed(1):'0.0')+'% per session · '+
+      (post?(TOTAL-S.day)+' bonus sessions left':left+' sessions left to goal')+'.</span>');
+  }
+  renderAll();
+}
+
+/* ================= GROWTH TAB ================= */
+function renderGrowth(){
+  const planNow=planAt(S.day);
+  $('g_plan').textContent=money(planNow);
+  const diff=S.eq-planNow;
+  $('g_diff').textContent=signed(diff);
+  $('g_diff').style.color=diff>=0?'var(--good)':'var(--bad)';
+  $('g_mult').textContent=(S.eq/START_EQ).toFixed(2)+'x';
+  $('g_left').textContent=money(Math.max(0,GOAL-S.eq));
+
+  const trades=S.log.flatMap(e=>e.trades||[]).concat(S.dayTrades||[]);
+  const wins=trades.filter(t=>t.win).length;
+  $('g_used').textContent=S.day+' / '+TOTAL;
+  $('g_flat').textContent=flatStreak()+' in a row';
+  $('g_trades').textContent=trades.length;
+  $('g_wr').textContent=trades.length?Math.round(wins/trades.length*100)+'%':'—';
+
+  const nextIdx=Math.min(TOTAL, (Math.floor(S.day/5)+1)*5);
+  const need=Math.max(0,planAt(nextIdx)-S.eq);
+  const span=Math.max(1,nextIdx-S.day);
+  const bonus=S.day>=GOAL_IDX;
+  $('g_next').innerHTML=(bonus?'Bonus checkpoint: by session ':'By session ')+'<b>'+nextIdx+'</b> ('+
+    (SESSIONS[nextIdx-1]||'—')+') the plan wants <b>'+money(planAt(nextIdx))+'</b>. That is <b>'+money(need)+
+    '</b> away — about <b>'+money(need/span)+'</b> per session over the next '+span+' sessions'+
+    (bonus?' (bonus — risk capped at 2%)':'')+'.';
+  drawChart();
+}
+
+function drawChart(){
+  const cv=$('chart'); if(!cv) return;
+  const box=cv.parentNode.getBoundingClientRect();
+  if(box.width<50) return;
+  const W=Math.max(260,Math.floor(box.width)), H=260;
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
+  const c=cv.getContext('2d');
+  c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+
+  const P={l:44,r:10,t:12,b:20};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+
+  const vals=[START_EQ,GOAL,S.eq];
+  S.log.forEach(e=>{vals.push(e.start||START_EQ,e.end||START_EQ)});
+  vals.push(planAt(TOTAL));
+  let lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
+  lo=Math.max(1,lo*0.82); hi=hi*1.15;
+  if(hi<=lo) hi=lo*2;
+  const L=Math.log;
+  const y=v=>P.t+ih-((L(Math.max(v,0.000001))-L(lo))/(L(hi)-L(lo)))*ih;
+  const x=i=>P.l+(Math.min(i,TOTAL)/TOTAL)*iw;
+
+  c.font='11px Barlow, sans-serif'; c.textBaseline='middle';
+  [26,50,100,250,500,1000,2500,5000,10000,18000].forEach(v=>{
+    if(v<lo||v>hi) return;
+    const yy=y(v);
+    c.strokeStyle='rgba(255,255,255,.05)'; c.beginPath();
+    c.moveTo(P.l,yy); c.lineTo(W-P.r,yy); c.stroke();
+    c.fillStyle='#586576'; c.textAlign='right';
+    c.fillText(shortM(v),P.l-7,yy);
+  });
+
+  c.textAlign='center'; c.fillStyle='#4e5a6b';
+  for(let i=0;i<=TOTAL;i+=14){
+    const xx=x(i);
+    c.strokeStyle='rgba(255,255,255,.04)'; c.beginPath();
+    c.moveTo(xx,P.t); c.lineTo(xx,P.t+ih); c.stroke();
+    const d=SESSIONS[Math.min(i,TOTAL-1)];
+    if(d) c.fillText(d.slice(5),xx,P.t+ih+11);
+  }
+
+  const sx=x(GOAL_IDX);
+  c.setLineDash([3,4]); c.strokeStyle='rgba(74,85,102,.85)'; c.lineWidth=1;
+  c.beginPath(); c.moveTo(sx,P.t); c.lineTo(sx,P.t+ih); c.stroke(); c.setLineDash([]);
+
+  c.strokeStyle='#4d8dff'; c.lineWidth=2; c.beginPath();
+  for(let i=0;i<=TOTAL;i++){
+    const xx=x(i), yy=y(planAt(i));
+    i?c.lineTo(xx,yy):c.moveTo(xx,yy);
+  }
+  c.stroke();
+
+  const pts=[[0,START_EQ]];
+  S.log.forEach(e=>{ pts.push([e.i,e.start]); pts.push([e.i+1,e.end]); });
+  if(pts[pts.length-1][0]===S.day) pts[pts.length-1][1]=S.eq;
+  else pts.push([S.day,S.eq]);
+
+  const grad=c.createLinearGradient(0,P.t,0,P.t+ih);
+  grad.addColorStop(0,'rgba(0,214,143,.22)');
+  grad.addColorStop(1,'rgba(0,214,143,0)');
+  c.beginPath(); c.moveTo(x(pts[0][0]),y(pts[0][1]));
+  pts.forEach(p=>c.lineTo(x(p[0]),y(p[1])));
+  c.lineTo(x(pts[pts.length-1][0]),P.t+ih);
+  c.lineTo(x(pts[0][0]),P.t+ih); c.closePath();
+  c.fillStyle=grad; c.fill();
+
+  c.strokeStyle='#00d68f'; c.lineWidth=2.4; c.lineJoin='round'; c.beginPath();
+  pts.forEach((p,i)=>i?c.lineTo(x(p[0]),y(p[1])):c.moveTo(x(p[0]),y(p[1])));
+  c.stroke();
+
+  const cx=x(S.day), cy=y(S.eq);
+  c.beginPath(); c.arc(cx,cy,6.5,0,7); c.fillStyle='rgba(0,214,143,.22)'; c.fill();
+  c.beginPath(); c.arc(cx,cy,3.4,0,7); c.fillStyle='#00d68f'; c.fill();
+  c.lineWidth=1.8; c.strokeStyle='#eaf0fa'; c.stroke();
+}
+
+/* ================= HISTORY TAB ================= */
+function renderHistory(){
+  const net=S.eq-START_EQ;
+  $('h_net').textContent=signed(net);
+  $('h_net').style.color=net>=0?'var(--good)':'var(--bad)';
+
+  const days=S.log.map(e=>(e.end||0)-(e.start||0));
+  const best=days.length?Math.max.apply(null,days):0;
+  const worst=days.length?Math.min.apply(null,days):0;
+  $('h_best').textContent=signed(best); $('h_best').style.color='var(--good)';
+  $('h_worst').textContent=signed(worst); $('h_worst').style.color='var(--bad)';
+
+  const lastBackup=localStorage.getItem('tplan-backup-at');
+  $('b_status').textContent = lastBackup
+    ? 'Last backup: '+new Date(lastBackup).toLocaleString()
+    : 'No backup saved yet. Do it now — one tap.';
+
+  const list=$('h_list');
+  const rows=[];
+  if(S.day<TOTAL) rows.push({
+    i:S.day, date:SESSIONS[S.day], start:S.dayStart, end:S.eq,
+    skipped:false, trades:(S.dayTrades||[]).slice(), live:true
+  });
+  const all=rows.concat(S.log.slice().reverse());
+
+  if(!all.length){
+    list.innerHTML='<div class="hint" style="padding:10px 0">No sessions logged yet. Take a trade and hit Won/Lost, or press "No setup today".</div>';
+    return;
+  }
+
+  list.innerHTML=all.map(e=>{
+    const d=(e.end||0)-(e.start||0);
+    const tr=e.trades||[];
+    const winN=tr.filter(t=>t.win).length;
+    const flat=e.skipped||(!e.live&&tr.length===0);
+    const col=flat?'#586576':d>=0?'var(--good)':'var(--bad)';
+    let val;
+    if(e.live&&tr.length===0) val='OPEN';
+    else if(flat) val='FLAT';
+    else val=signed(d);
+    const sub=flat?'nothing taken — $0 cost'
+      :(tr.length+' trade'+(tr.length===1?'':'s')+' · '+winN+'W/'+(tr.length-winN)+'L');
+    const col2=(e.live&&tr.length===0)?'var(--dim2)':col;
+    return '<div class="hrow">'+
+      '<span class="hdot" style="background:'+(flat?'#586576':col)+'"></span>'+
+      '<div class="hmain"><div class="hdate">Day '+e.i+' · '+(e.date||'—')+
+        (e.live?' <span class="d2">· today</span>':'')+(e.skipped?' <span class="d2">· no setup</span>':'')+'</div>'+
+      '<div class="hsub">'+sub+'</div></div>'+
+      '<div class="hval" style="color:'+col2+'">'+val+'</div></div>';
+  }).join('');
+}
+
+/* ================= BACKUP ================= */
+function exportData(){
+  try{
+    const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='trading-plan-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    localStorage.setItem('tplan-backup-at',new Date().toISOString());
+    renderHistory();
+  }catch(e){ alert('Could not create the file. Long-press the page and check downloads are allowed.'); }
+}
+
+function importData(ev){
+  const f=ev.target.files[0]; ev.target.value=''; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const o=JSON.parse(r.result);
+      if(typeof o.eq!=='number'||!Array.isArray(o.log)) throw 0;
+      if(!confirm('Replace current progress with '+money(o.eq)+' (day '+o.day+')?')) return;
+      S=Object.assign({},DEF,o); save();
+      renderAll();
+      setMsg('g','<b>Backup restored.</b> Equity '+money(S.eq)+', day '+S.day+'.');
+    }catch(e){ alert('That is not a valid backup file.'); }
+  };
+  r.readAsText(f);
+}
+
+/* ================= NAV / INIT ================= */
+function renderAll(){ renderPlan(); renderGrowth(); renderHistory(); }
+
+document.querySelectorAll('.tab').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.tab));
+    if(b.dataset.tab==='growth') requestAnimationFrame(renderGrowth);
+    if(b.dataset.tab==='history') renderHistory();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+['pair','price'].forEach(id=>$(id).addEventListener('change',()=>{suggestPV();renderPlan();}));
+['sl','tp','pv','step'].forEach(id=>$(id).addEventListener('input',renderSizer));
+$('result').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); logTrade(1); } });
+window.addEventListener('resize',()=>{ if($('p-growth').classList.contains('on')) drawChart(); });
+window.addEventListener('orientationchange',()=>setTimeout(()=>{ if($('p-growth').classList.contains('on')) drawChart(); },200));
+
+function resetAll(){
+  if(!confirm('Erase all progress and start over at $26? Export a backup first if you are not sure.')) return;
+  S=Object.assign({},DEF); save();
+  $('msg').className=''; $('msg').innerHTML='';
+  $('result').value='';
+  renderAll();
+}
+
+$('fSess').textContent=TOTAL;
+$('fGoal').textContent=GOAL_IDX;
+suggestPV();
+renderAll();
+
+/* ask the browser not to evict our data */
+if(navigator.storage && navigator.storage.persist){
+  navigator.storage.persist().catch(()=>{});
+}
+</script>
+</body>
+</html>
